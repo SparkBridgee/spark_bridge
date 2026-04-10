@@ -64,35 +64,67 @@ export function normalizeTikTokVideo(raw: AnyObj): NormalizedVideo {
   };
 }
 
-// Instagram: apify~instagram-scraper
+// Instagram: apify~instagram-reel-scraper (active)
+//
+// 필드명은 공식 스키마 문서가 부족해 방어적으로 여러 후보를 파싱함.
+// 기존 apify~instagram-scraper 출력과도 호환되도록 fallback 체인을 유지.
 export function normalizeInstagramVideo(raw: AnyObj): NormalizedVideo {
-  const shortCode = str(raw.shortCode) || str(raw.code);
+  const shortCode = str(raw.shortCode) || str(raw.code) || str(raw.shortcode);
   const id = str(raw.id) || shortCode;
   const externalUrl =
     str(raw.url) ||
-    (shortCode ? `https://www.instagram.com/p/${shortCode}/` : "");
+    str(raw.reelUrl) ||
+    (shortCode ? `https://www.instagram.com/reel/${shortCode}/` : "");
 
-  const timestamp = str(raw.timestamp);
-  const postedAt = timestamp
-    ? new Date(timestamp).toISOString()
-    : new Date(0).toISOString();
+  const timestampRaw = raw.timestamp ?? raw.takenAt ?? raw.taken_at;
+  const timestampStr =
+    typeof timestampRaw === "string" ? timestampRaw : "";
+  const timestampNum =
+    typeof timestampRaw === "number" ? timestampRaw : 0;
+  const postedAt = timestampStr
+    ? new Date(timestampStr).toISOString()
+    : timestampNum
+      ? new Date(
+          timestampNum > 1e12 ? timestampNum : timestampNum * 1000
+        ).toISOString()
+      : new Date(0).toISOString();
 
   return {
     id: `ig-${id}`,
     platform: "instagram",
     videoUrl: externalUrl,
-    thumbnailUrl: str(raw.displayUrl) || str(raw.thumbnailUrl),
+    thumbnailUrl:
+      str(raw.displayUrl) ||
+      str(raw.thumbnailUrl) ||
+      str(raw.thumbnail) ||
+      str(raw.imageUrl),
     caption: str(raw.caption),
-    views: num(raw.videoViewCount ?? raw.videoPlayCount),
-    likes: num(raw.likesCount),
-    comments: num(raw.commentsCount),
+    views: num(
+      raw.videoViewCount ??
+        raw.videoPlayCount ??
+        raw.playCount ??
+        raw.viewCount ??
+        raw.views
+    ),
+    likes: num(raw.likesCount ?? raw.likeCount ?? raw.likes),
+    comments: num(raw.commentsCount ?? raw.commentCount ?? raw.comments),
     shares: num(
-      raw.reshareCount ?? raw.resharesCount ?? raw.shareCount ?? raw.sharesCount
+      raw.sharesCount ??
+        raw.shareCount ??
+        raw.resharesCount ??
+        raw.reshareCount ??
+        raw.shares
     ),
     postedAt,
     author: {
-      username: str(raw.ownerUsername),
-      avatarUrl: undefined,
+      username:
+        str(raw.ownerUsername) ||
+        str(raw.username) ||
+        str((raw.owner as AnyObj | undefined)?.username),
+      avatarUrl:
+        str(raw.ownerProfilePicUrl) ||
+        str((raw.owner as AnyObj | undefined)?.profile_pic_url) ||
+        undefined,
     },
   };
 }
