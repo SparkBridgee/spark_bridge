@@ -26,12 +26,13 @@ async function fetchAccountVideos(
 export function useAccountVideosQuery(
   platform: Platform,
   username: string,
-  limit = 50
+  limit = 50,
+  enabled = true
 ) {
   return useQuery({
     queryKey: [...queryKeys.accountVideos(platform, username), limit],
     queryFn: () => fetchAccountVideos(platform, username, limit),
-    enabled: Boolean(username),
+    enabled: Boolean(username) && enabled,
     staleTime: 5 * 60_000,
   });
 }
