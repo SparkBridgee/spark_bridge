@@ -55,6 +55,7 @@ export function normalizeTikTokVideo(raw: AnyObj): NormalizedVideo {
     views: num(raw.playCount ?? raw.play_count),
     likes: num(raw.diggCount ?? raw.digg_count),
     comments: num(raw.commentCount ?? raw.comment_count),
+    shares: num(raw.shareCount ?? raw.share_count),
     postedAt,
     author: {
       username,
@@ -85,6 +86,9 @@ export function normalizeInstagramVideo(raw: AnyObj): NormalizedVideo {
     views: num(raw.videoViewCount ?? raw.videoPlayCount),
     likes: num(raw.likesCount),
     comments: num(raw.commentsCount),
+    shares: num(
+      raw.reshareCount ?? raw.resharesCount ?? raw.shareCount ?? raw.sharesCount
+    ),
     postedAt,
     author: {
       username: str(raw.ownerUsername),

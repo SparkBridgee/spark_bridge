@@ -9,6 +9,7 @@ export interface NormalizedVideo {
   views: number;
   likes: number;
   comments: number;
+  shares: number;
   postedAt: string; // ISO
   author: {
     username: string;

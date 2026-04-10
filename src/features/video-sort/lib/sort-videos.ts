@@ -18,6 +18,8 @@ export function sortVideos(
       return copy.sort((a, b) => b.likes - a.likes);
     case "comments":
       return copy.sort((a, b) => b.comments - a.comments);
+    case "shares":
+      return copy.sort((a, b) => b.shares - a.shares);
     default:
       return copy;
   }

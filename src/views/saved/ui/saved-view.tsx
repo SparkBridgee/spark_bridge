@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Eye, Heart, MessageCircle, Trash2, ChevronDown } from "lucide-react";
+import { Eye, Heart, MessageCircle, Share2, Trash2, ChevronDown } from "lucide-react";
 import {
   Button,
   Card,
@@ -74,6 +74,10 @@ function SelectionItem({ selection }: { selection: SavedSelectionWithVideos }) {
               <span className="flex items-center gap-1">
                 <MessageCircle className="h-3 w-3" />
                 {formatCount(selection.avg_comments)}
+              </span>
+              <span className="flex items-center gap-1">
+                <Share2 className="h-3 w-3" />
+                {formatCount(selection.avg_shares)}
               </span>
             </div>
           </div>
@@ -150,6 +154,10 @@ function SelectionItem({ selection }: { selection: SavedSelectionWithVideos }) {
                           <span className="flex items-center gap-0.5">
                             <MessageCircle className="h-3 w-3" />
                             {formatCount(v.comment_count ?? 0)}
+                          </span>
+                          <span className="flex items-center gap-0.5">
+                            <Share2 className="h-3 w-3" />
+                            {formatCount(v.share_count ?? 0)}
                           </span>
                         </span>
                       </div>

@@ -12,6 +12,7 @@ export interface SavedSelectionRow {
   avg_views: number;
   avg_likes: number;
   avg_comments: number;
+  avg_shares: number;
   created_at: string;
 }
 
@@ -25,6 +26,7 @@ export interface SavedSelectionVideoRow {
   view_count: number | null;
   like_count: number | null;
   comment_count: number | null;
+  share_count: number | null;
   posted_at: string | null;
 }
 
