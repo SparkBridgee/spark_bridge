@@ -13,12 +13,18 @@ import type { Platform } from "@/entities/video/model/types";
 interface AccountViewProps {
   platform: Platform;
   username: string;
+  limit?: number;
 }
 
-export function AccountView({ platform, username }: AccountViewProps) {
+export function AccountView({
+  platform,
+  username,
+  limit = 50,
+}: AccountViewProps) {
   const { data, isLoading, isError, error } = useAccountVideosQuery(
     platform,
-    username
+    username,
+    limit
   );
   const { clear } = useVideoSelect();
 
@@ -62,10 +68,16 @@ export function AccountView({ platform, username }: AccountViewProps) {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/60" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
             </span>
-            @{username} 의 영상을 불러오는 중...
+            @{username} 의 최신 {limit}개 영상을 불러오는 중...
           </div>
           <VideoGridSkeleton />
         </>
+      )}
+
+      {!isLoading && !isError && videos.length > 0 && (
+        <p className="-mb-2 text-[11px] text-muted-foreground sm:text-xs">
+          게시일 최신순 기준 · 최대 {limit}개 · 총 {videos.length}개 수집됨
+        </p>
       )}
 
       {isError && (

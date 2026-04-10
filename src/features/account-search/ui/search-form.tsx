@@ -20,17 +20,30 @@ export function SearchForm() {
   );
 
   const [username, setUsername] = useState("");
+  const [limitInput, setLimitInput] = useState("");
 
-  function go(platform: Platform, raw: string) {
+  function go(platform: Platform, raw: string, rawLimit?: string) {
     const cleaned = raw.replace(/^@/, "").trim();
     if (!cleaned) return;
     pushQuery(platform, cleaned);
-    router.push(`/account/${platform}/${encodeURIComponent(cleaned)}`);
+
+    const parsed = Number(rawLimit);
+    const params = new URLSearchParams();
+    if (Number.isFinite(parsed) && parsed > 0) {
+      // clamp to the same range the server enforces
+      const clamped = Math.min(200, Math.max(10, Math.trunc(parsed)));
+      params.set("limit", String(clamped));
+    }
+    const qs = params.toString();
+    const path = `/account/${platform}/${encodeURIComponent(cleaned)}${
+      qs ? `?${qs}` : ""
+    }`;
+    router.push(path);
   }
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
-    go(activePlatform, username);
+    go(activePlatform, username, limitInput);
   }
 
   function onRemoveChip(e: MouseEvent, q: string) {
@@ -51,21 +64,39 @@ export function SearchForm() {
         </TabsList>
       </Tabs>
 
-      <form onSubmit={onSubmit} className="flex w-full items-center gap-2">
-        <Input
-          type="text"
-          name="username"
-          placeholder={
-            activePlatform === "tiktok" ? "예: khaby.lame" : "예: humansofny"
-          }
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-          className="flex-1"
-        />
-        <Button type="submit" className="shrink-0">
-          검색
-        </Button>
+      <form onSubmit={onSubmit} className="flex w-full flex-col gap-2">
+        <div className="flex w-full items-center gap-2">
+          <Input
+            type="text"
+            name="username"
+            placeholder={
+              activePlatform === "tiktok" ? "예: khaby.lame" : "예: humansofny"
+            }
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            className="flex-1"
+          />
+          <Input
+            type="number"
+            name="limit"
+            inputMode="numeric"
+            min={10}
+            max={200}
+            step={10}
+            placeholder="50"
+            value={limitInput}
+            onChange={(e) => setLimitInput(e.target.value)}
+            className="w-20 shrink-0"
+            aria-label="불러올 영상 갯수"
+          />
+          <Button type="submit" className="shrink-0">
+            검색
+          </Button>
+        </div>
+        <p className="text-[11px] text-muted-foreground">
+          갯수 비우면 최근 50개 · 최대 200개 · 게시일 최신순 기준
+        </p>
       </form>
 
       {recentQueries.length > 0 && (

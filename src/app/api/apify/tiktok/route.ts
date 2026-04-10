@@ -25,7 +25,7 @@ export async function POST(req: Request) {
   const b = (body || {}) as { username?: unknown; limit?: unknown };
   const username = typeof b.username === "string" ? b.username : "";
   const limitRaw = typeof b.limit === "number" ? b.limit : Number(b.limit) || 50;
-  const limit = Math.min(100, Math.max(10, Math.trunc(limitRaw)));
+  const limit = Math.min(200, Math.max(10, Math.trunc(limitRaw)));
 
   if (!username) {
     return NextResponse.json({ error: "username required" }, { status: 400 });
