@@ -15,14 +15,16 @@ export function SearchForm() {
   const pushQuery = useUIStore((s) => s.pushQuery);
   const removeQuery = useUIStore((s) => s.removeQuery);
   const clearQueries = useUIStore((s) => s.clearQueries);
-  const recentQueries = useUIStore((s) => s.recentQueries);
+  const recentQueries = useUIStore(
+    (s) => s.recentQueries[activePlatform] ?? []
+  );
 
   const [username, setUsername] = useState("");
 
   function go(platform: Platform, raw: string) {
     const cleaned = raw.replace(/^@/, "").trim();
     if (!cleaned) return;
-    pushQuery(cleaned);
+    pushQuery(platform, cleaned);
     router.push(`/account/${platform}/${encodeURIComponent(cleaned)}`);
   }
 
@@ -34,7 +36,7 @@ export function SearchForm() {
   function onRemoveChip(e: MouseEvent, q: string) {
     e.stopPropagation();
     e.preventDefault();
-    removeQuery(q);
+    removeQuery(activePlatform, q);
   }
 
   return (
@@ -69,10 +71,12 @@ export function SearchForm() {
       {recentQueries.length > 0 && (
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <p className="text-xs text-muted-foreground">최근 검색어</p>
+            <p className="text-xs text-muted-foreground">
+              최근 검색어 · {activePlatform === "tiktok" ? "TikTok" : "Instagram"}
+            </p>
             <button
               type="button"
-              onClick={clearQueries}
+              onClick={() => clearQueries(activePlatform)}
               className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
             >
               전체 삭제
@@ -82,7 +86,7 @@ export function SearchForm() {
             <AnimatePresence initial={false}>
               {recentQueries.map((q) => (
                 <motion.div
-                  key={q}
+                  key={`${activePlatform}-${q}`}
                   layout
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
