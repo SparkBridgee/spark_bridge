@@ -127,7 +127,7 @@ export function SearchForm() {
                 >
                   <button
                     type="button"
-                    onClick={() => go(activePlatform, q)}
+                    onClick={() => go(activePlatform, q, limitInput)}
                     className="py-1 pl-3 pr-1.5"
                   >
                     @{q}
