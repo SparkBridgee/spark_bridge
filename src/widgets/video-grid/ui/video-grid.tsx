@@ -8,7 +8,7 @@ import { useVideoSelect } from "@/features/video-select/model/use-video-select";
 import { useSaveSelectionMutation } from "@/features/save-selection/api/use-save-selection-mutation";
 import { SortToolbar } from "@/features/video-sort/ui/sort-toolbar";
 import { sortVideos } from "@/features/video-sort/lib/sort-videos";
-import type { SortKey } from "@/features/video-sort/model/types";
+import { DEFAULT_SORT, type SortState } from "@/features/video-sort/model/types";
 import { Button, toast } from "@/shared/ui";
 import { useIntersection } from "@/shared/lib/hooks/use-intersection";
 import type { NormalizedVideo, Platform } from "@/entities/video/model/types";
@@ -33,20 +33,20 @@ export function VideoGrid({ videos, platform, username }: VideoGridProps) {
     useVideoSelect();
   const saveMutation = useSaveSelectionMutation();
 
-  const [sortKey, setSortKey] = useState<SortKey>("latest");
+  const [sortState, setSortState] = useState<SortState>(DEFAULT_SORT);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const sortedVideos = useMemo(
-    () => sortVideos(videos, sortKey),
-    [videos, sortKey]
+    () => sortVideos(videos, sortState.key, sortState.dir),
+    [videos, sortState]
   );
 
-  // Reset pagination when sort key or source list changes — "storing info from
+  // Reset pagination when sort state or source list changes — "storing info from
   // previous renders" pattern: https://react.dev/reference/react/useState#storing-information-from-previous-renders
-  const [prevSort, setPrevSort] = useState(sortKey);
+  const [prevSort, setPrevSort] = useState(sortState);
   const [prevVideos, setPrevVideos] = useState(videos);
-  if (prevSort !== sortKey || prevVideos !== videos) {
-    setPrevSort(sortKey);
+  if (prevSort !== sortState || prevVideos !== videos) {
+    setPrevSort(sortState);
     setPrevVideos(videos);
     setVisibleCount(PAGE_SIZE);
   }
@@ -110,7 +110,7 @@ export function VideoGrid({ videos, platform, username }: VideoGridProps) {
     <>
       {/* Toolbar: sort + select all */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <SortToolbar value={sortKey} onChange={setSortKey} />
+        <SortToolbar value={sortState} onChange={setSortState} />
         <div className="flex items-center justify-between gap-2">
           <p className="text-xs text-muted-foreground sm:text-sm">
             {sortedVideos.length}개 · 평균 분석 저장
