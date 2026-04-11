@@ -56,6 +56,7 @@ export function normalizeTikTokVideo(raw: AnyObj): NormalizedVideo {
     likes: num(raw.diggCount ?? raw.digg_count),
     comments: num(raw.commentCount ?? raw.comment_count),
     shares: num(raw.shareCount ?? raw.share_count),
+    reposts: num(raw.repostCount ?? raw.repost_count),
     postedAt,
     author: {
       username,
@@ -115,6 +116,9 @@ export function normalizeInstagramVideo(raw: AnyObj): NormalizedVideo {
         raw.reshareCount ??
         raw.shares
     ),
+    // Instagram doesn't expose a native repost count (no dedicated
+    // "repost" action like TikTok). Keep 0 to preserve the schema.
+    reposts: 0,
     postedAt,
     author: {
       username:

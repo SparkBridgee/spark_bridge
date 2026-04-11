@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Eye, Heart, MessageCircle, Share2, X, Save, Loader2 } from "lucide-react";
+import { Eye, Heart, MessageCircle, Share2, Repeat2, X, Save, Loader2 } from "lucide-react";
 import { VideoCard } from "@/entities/video/ui/video-card";
 import { useVideoSelect } from "@/features/video-select/model/use-video-select";
 import { useSaveSelectionMutation } from "@/features/save-selection/api/use-save-selection-mutation";
@@ -82,6 +82,10 @@ export function VideoGrid({ videos, platform, username }: VideoGridProps) {
   const avgShares =
     selected.length > 0
       ? selected.reduce((a, v) => a + v.shares, 0) / selected.length
+      : 0;
+  const avgReposts =
+    selected.length > 0
+      ? selected.reduce((a, v) => a + v.reposts, 0) / selected.length
       : 0;
 
   async function onSave() {
@@ -219,6 +223,13 @@ export function VideoGrid({ videos, platform, username }: VideoGridProps) {
                         {formatCount(avgShares)}
                       </strong>
                       공유
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Repeat2 className="h-3.5 w-3.5" />
+                      <strong className="text-foreground">
+                        {formatCount(avgReposts)}
+                      </strong>
+                      리포스트
                     </span>
                   </div>
                 </div>

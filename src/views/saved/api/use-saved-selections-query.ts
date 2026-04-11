@@ -13,6 +13,7 @@ export interface SavedSelectionRow {
   avg_likes: number;
   avg_comments: number;
   avg_shares: number;
+  avg_reposts: number;
   cost: number;
   created_at: string;
 }
@@ -28,6 +29,7 @@ export interface SavedSelectionVideoRow {
   like_count: number | null;
   comment_count: number | null;
   share_count: number | null;
+  repost_count: number | null;
   posted_at: string | null;
 }
 

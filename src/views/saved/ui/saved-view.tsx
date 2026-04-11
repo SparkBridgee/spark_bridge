@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Eye, Heart, MessageCircle, Share2, Trash2, ChevronDown } from "lucide-react";
+import { Eye, Heart, MessageCircle, Share2, Repeat2, Trash2, ChevronDown } from "lucide-react";
 import {
   Button,
   Card,
@@ -118,6 +118,10 @@ function SelectionItem({ selection }: { selection: SavedSelectionWithVideos }) {
                 <Share2 className="h-3 w-3" />
                 {formatCount(selection.avg_shares)}
               </span>
+              <span className="flex items-center gap-1">
+                <Repeat2 className="h-3 w-3" />
+                {formatCount(Number(selection.avg_reposts) || 0)}
+              </span>
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-2">
               <MetricsBadge er={er} cpv={cpv} />
@@ -220,6 +224,10 @@ function SelectionItem({ selection }: { selection: SavedSelectionWithVideos }) {
                           <span className="flex items-center gap-0.5">
                             <Share2 className="h-3 w-3" />
                             {formatCount(v.share_count ?? 0)}
+                          </span>
+                          <span className="flex items-center gap-0.5">
+                            <Repeat2 className="h-3 w-3" />
+                            {formatCount(v.repost_count ?? 0)}
                           </span>
                         </span>
                       </div>

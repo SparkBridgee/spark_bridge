@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Check, Eye, Heart, MessageCircle, Share2 } from "lucide-react";
+import { Check, Eye, Heart, MessageCircle, Share2, Repeat2 } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import { proxiedImage } from "@/shared/lib/image-proxy";
 import type { NormalizedVideo } from "@/entities/video/model/types";
@@ -102,6 +102,10 @@ export function VideoCard({ video, selected, onToggleSelect }: VideoCardProps) {
             <span className="flex items-center gap-0.5">
               <Share2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               {formatCount(video.shares)}
+            </span>
+            <span className="flex items-center gap-0.5">
+              <Repeat2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+              {formatCount(video.reposts)}
             </span>
           </div>
         </div>

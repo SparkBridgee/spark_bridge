@@ -40,6 +40,7 @@ export function useSaveSelectionMutation() {
       const avgLikes = average(videos.map((v) => v.likes));
       const avgComments = average(videos.map((v) => v.comments));
       const avgShares = average(videos.map((v) => v.shares));
+      const avgReposts = average(videos.map((v) => v.reposts));
 
       const { data: inserted, error: insertErr } = await supabase
         .from("saved_selections")
@@ -52,6 +53,7 @@ export function useSaveSelectionMutation() {
           avg_likes: avgLikes,
           avg_comments: avgComments,
           avg_shares: avgShares,
+          avg_reposts: avgReposts,
         })
         .select("id")
         .single();
@@ -72,6 +74,7 @@ export function useSaveSelectionMutation() {
         like_count: v.likes,
         comment_count: v.comments,
         share_count: v.shares,
+        repost_count: v.reposts,
         posted_at: v.postedAt || null,
       }));
 
