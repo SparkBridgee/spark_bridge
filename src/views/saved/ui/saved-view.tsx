@@ -114,22 +114,26 @@ function SelectionItem({ selection }: { selection: SavedSelectionWithVideos }) {
                 <MessageCircle className="h-3 w-3" />
                 {formatCount(selection.avg_comments)}
               </span>
-              <span
-                className="flex items-center gap-1"
-                title={
-                  selection.platform === "instagram"
-                    ? "스토리 reshare + 프로필 repost + DM 공유 합산"
-                    : undefined
-                }
-              >
-                <Share2 className="h-3 w-3" />
-                {formatCount(selection.avg_shares)}
-              </span>
-              {selection.platform === "tiktok" && (
-                <span className="flex items-center gap-1">
-                  <Repeat2 className="h-3 w-3" />
-                  {formatCount(Number(selection.avg_reposts) || 0)}
+              {selection.platform === "instagram" ? (
+                <span
+                  className="flex items-center gap-1"
+                  title="스토리 reshare + 프로필 repost + DM 공유 합산"
+                >
+                  <Share2 className="h-3 w-3" />
+                  <Repeat2 className="h-3 w-3 opacity-70" />
+                  {formatCount(selection.avg_shares)}
                 </span>
+              ) : (
+                <>
+                  <span className="flex items-center gap-1">
+                    <Share2 className="h-3 w-3" />
+                    {formatCount(selection.avg_shares)}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Repeat2 className="h-3 w-3" />
+                    {formatCount(Number(selection.avg_reposts) || 0)}
+                  </span>
+                </>
               )}
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -230,22 +234,26 @@ function SelectionItem({ selection }: { selection: SavedSelectionWithVideos }) {
                             <MessageCircle className="h-3 w-3" />
                             {formatCount(v.comment_count ?? 0)}
                           </span>
-                          <span
-                            className="flex items-center gap-0.5"
-                            title={
-                              selection.platform === "instagram"
-                                ? "스토리 reshare + 프로필 repost + DM 공유 합산"
-                                : undefined
-                            }
-                          >
-                            <Share2 className="h-3 w-3" />
-                            {formatCount(v.share_count ?? 0)}
-                          </span>
-                          {selection.platform === "tiktok" && (
-                            <span className="flex items-center gap-0.5">
-                              <Repeat2 className="h-3 w-3" />
-                              {formatCount(v.repost_count ?? 0)}
+                          {selection.platform === "instagram" ? (
+                            <span
+                              className="flex items-center gap-0.5"
+                              title="스토리 reshare + 프로필 repost + DM 공유 합산"
+                            >
+                              <Share2 className="h-3 w-3" />
+                              <Repeat2 className="h-3 w-3 opacity-70" />
+                              {formatCount(v.share_count ?? 0)}
                             </span>
+                          ) : (
+                            <>
+                              <span className="flex items-center gap-0.5">
+                                <Share2 className="h-3 w-3" />
+                                {formatCount(v.share_count ?? 0)}
+                              </span>
+                              <span className="flex items-center gap-0.5">
+                                <Repeat2 className="h-3 w-3" />
+                                {formatCount(v.repost_count ?? 0)}
+                              </span>
+                            </>
                           )}
                         </span>
                       </div>

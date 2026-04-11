@@ -99,22 +99,26 @@ export function VideoCard({ video, selected, onToggleSelect }: VideoCardProps) {
               <MessageCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               {formatCount(video.comments)}
             </span>
-            <span
-              className="flex items-center gap-0.5"
-              title={
-                video.platform === "instagram"
-                  ? "스토리 reshare, 프로필 repost, DM 공유 합산값"
-                  : undefined
-              }
-            >
-              <Share2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-              {formatCount(video.shares)}
-            </span>
-            {video.platform === "tiktok" && (
-              <span className="flex items-center gap-0.5">
-                <Repeat2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                {formatCount(video.reposts)}
+            {video.platform === "instagram" ? (
+              <span
+                className="flex items-center gap-0.5"
+                title="스토리 reshare + 프로필 repost + DM 공유 합산값"
+              >
+                <Share2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                <Repeat2 className="h-3 w-3 opacity-70 sm:h-3.5 sm:w-3.5" />
+                {formatCount(video.shares)}
               </span>
+            ) : (
+              <>
+                <span className="flex items-center gap-0.5">
+                  <Share2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                  {formatCount(video.shares)}
+                </span>
+                <span className="flex items-center gap-0.5">
+                  <Repeat2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                  {formatCount(video.reposts)}
+                </span>
+              </>
             )}
           </div>
         </div>

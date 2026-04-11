@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowUp, Repeat2 } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import {
   SORT_OPTIONS,
@@ -25,7 +25,9 @@ export function SortToolbar({ value, onChange, platform }: SortToolbarProps) {
   const options = useMemo(
     () =>
       platform === "instagram"
-        ? SORT_OPTIONS.filter((o) => o.key !== "reposts")
+        ? SORT_OPTIONS.filter((o) => o.key !== "reposts").map((o) =>
+            o.key === "shares" ? { ...o, label: "공유+리포스트" } : o
+          )
         : SORT_OPTIONS,
     [platform]
   );
@@ -82,6 +84,9 @@ export function SortToolbar({ value, onChange, platform }: SortToolbarProps) {
             )}
           >
             {opt.label}
+            {platform === "instagram" && opt.key === "shares" && (
+              <Repeat2 className="h-3 w-3 opacity-70" strokeWidth={2.5} />
+            )}
             {active &&
               (dir === "desc" ? (
                 <ArrowDown className="h-3 w-3" strokeWidth={2.5} />

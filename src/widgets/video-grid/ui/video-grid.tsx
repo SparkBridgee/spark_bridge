@@ -217,28 +217,35 @@ export function VideoGrid({ videos, platform, username }: VideoGridProps) {
                       </strong>
                       댓글
                     </span>
-                    <span
-                      className="flex items-center gap-1"
-                      title={
-                        platform === "instagram"
-                          ? "스토리 reshare, 프로필 repost, DM 공유 합산"
-                          : undefined
-                      }
-                    >
-                      <Share2 className="h-3.5 w-3.5" />
-                      <strong className="text-foreground">
-                        {formatCount(avgShares)}
-                      </strong>
-                      공유
-                    </span>
-                    {platform === "tiktok" && (
-                      <span className="flex items-center gap-1">
-                        <Repeat2 className="h-3.5 w-3.5" />
+                    {platform === "instagram" ? (
+                      <span
+                        className="flex items-center gap-1"
+                        title="스토리 reshare + 프로필 repost + DM 공유 합산"
+                      >
+                        <Share2 className="h-3.5 w-3.5" />
+                        <Repeat2 className="h-3.5 w-3.5 opacity-70" />
                         <strong className="text-foreground">
-                          {formatCount(avgReposts)}
+                          {formatCount(avgShares)}
                         </strong>
-                        리포스트
+                        공유+리포스트
                       </span>
+                    ) : (
+                      <>
+                        <span className="flex items-center gap-1">
+                          <Share2 className="h-3.5 w-3.5" />
+                          <strong className="text-foreground">
+                            {formatCount(avgShares)}
+                          </strong>
+                          공유
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Repeat2 className="h-3.5 w-3.5" />
+                          <strong className="text-foreground">
+                            {formatCount(avgReposts)}
+                          </strong>
+                          리포스트
+                        </span>
+                      </>
                     )}
                   </div>
                 </div>
