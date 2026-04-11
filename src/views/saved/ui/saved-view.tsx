@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Eye, Heart, MessageCircle, Share2, Trash2, ChevronDown } from "lucide-react";
 import {
@@ -17,6 +17,16 @@ import {
   type SavedSelectionWithVideos,
 } from "@/views/saved/api/use-saved-selections-query";
 import { useDeleteSelectionMutation } from "@/views/saved/api/use-delete-selection-mutation";
+import { useUIStore } from "@/shared/lib/stores/ui-store";
+import {
+  CostInput,
+  MetricsBadge,
+  MetricsDetail,
+  WeightsControl,
+  calcCpv,
+  calcWeightedEr,
+  totalViews,
+} from "@/features/saved-analytics";
 
 function formatCount(n: number): string {
   if (!Number.isFinite(n)) return "0";
@@ -28,6 +38,35 @@ function formatCount(n: number): string {
 function SelectionItem({ selection }: { selection: SavedSelectionWithVideos }) {
   const [open, setOpen] = useState(false);
   const deleteMutation = useDeleteSelectionMutation();
+  const erWeights = useUIStore((s) => s.erWeights);
+
+  const metrics = useMemo(() => {
+    const avgViews = Number(selection.avg_views) || 0;
+    const avgLikes = Number(selection.avg_likes) || 0;
+    const avgComments = Number(selection.avg_comments) || 0;
+    const avgShares = Number(selection.avg_shares) || 0;
+    const cost = Number(selection.cost) || 0;
+    const total = totalViews(avgViews, selection.video_count);
+    return {
+      avgViews,
+      avgLikes,
+      avgComments,
+      avgShares,
+      cost,
+      total,
+      er: calcWeightedEr(avgViews, avgLikes, avgComments, avgShares, erWeights),
+      cpv: calcCpv(cost, total),
+    };
+  }, [
+    selection.avg_views,
+    selection.avg_likes,
+    selection.avg_comments,
+    selection.avg_shares,
+    selection.video_count,
+    selection.cost,
+    erWeights,
+  ]);
+  const { er, cpv } = metrics;
 
   async function onDelete() {
     if (!confirm("이 저장 항목을 삭제할까요?")) return;
@@ -80,6 +119,7 @@ function SelectionItem({ selection }: { selection: SavedSelectionWithVideos }) {
                 {formatCount(selection.avg_shares)}
               </span>
             </div>
+            <MetricsBadge er={er} cpv={cpv} className="mt-1" />
           </div>
           <div className="flex w-full gap-2 sm:w-auto">
             <Button
@@ -111,7 +151,7 @@ function SelectionItem({ selection }: { selection: SavedSelectionWithVideos }) {
         </CardHeader>
 
         <AnimatePresence initial={false}>
-          {open && selection.videos.length > 0 && (
+          {open && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
@@ -119,8 +159,27 @@ function SelectionItem({ selection }: { selection: SavedSelectionWithVideos }) {
               transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
               className="overflow-hidden"
             >
-              <CardContent>
-                <ul className="flex flex-col gap-2 border-t pt-3">
+              <CardContent className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3 border-t pt-3">
+                  <MetricsDetail
+                    avgViews={metrics.avgViews}
+                    avgLikes={metrics.avgLikes}
+                    avgComments={metrics.avgComments}
+                    avgShares={metrics.avgShares}
+                    videoCount={selection.video_count}
+                    total={metrics.total}
+                    cost={metrics.cost}
+                    er={metrics.er}
+                    cpv={metrics.cpv}
+                    weights={erWeights}
+                  />
+                  <CostInput
+                    selectionId={selection.id}
+                    initialCost={metrics.cost}
+                  />
+                </div>
+                {selection.videos.length > 0 && (
+                <ul className="flex flex-col gap-2">
                   {selection.videos.map((v) => (
                     <li key={v.id} className="flex items-center gap-3 text-sm">
                       {v.thumbnail_url ? (
@@ -164,6 +223,7 @@ function SelectionItem({ selection }: { selection: SavedSelectionWithVideos }) {
                     </li>
                   ))}
                 </ul>
+                )}
               </CardContent>
             </motion.div>
           )}
@@ -184,6 +244,8 @@ export function SavedView() {
           저장한 영상 묶음과 평균 집계를 확인하세요.
         </p>
       </div>
+
+      <WeightsControl />
 
       {isLoading && (
         <div className="flex flex-col gap-3">

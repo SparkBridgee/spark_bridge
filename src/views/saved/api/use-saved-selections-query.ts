@@ -13,6 +13,7 @@ export interface SavedSelectionRow {
   avg_likes: number;
   avg_comments: number;
   avg_shares: number;
+  cost: number;
   created_at: string;
 }
 

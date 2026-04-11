@@ -3,6 +3,10 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { Platform } from "@/entities/video/model/types";
+import {
+  DEFAULT_WEIGHTS,
+} from "@/features/saved-analytics/lib/presets";
+import type { ErWeights } from "@/features/saved-analytics/lib/calculate";
 
 type RecentQueriesByPlatform = Record<Platform, string[]>;
 
@@ -12,6 +16,7 @@ type UIState = {
   activePlatform: Platform;
   recentQueries: RecentQueriesByPlatform;
   selectedVideoIds: Record<string, true>;
+  erWeights: ErWeights;
   setActivePlatform: (p: Platform) => void;
   pushQuery: (platform: Platform, q: string) => void;
   removeQuery: (platform: Platform, q: string) => void;
@@ -20,6 +25,9 @@ type UIState = {
   selectMany: (ids: string[]) => void;
   clearSelection: () => void;
   isSelected: (id: string) => boolean;
+  setErWeight: (key: keyof ErWeights, value: number) => void;
+  setErWeights: (weights: ErWeights) => void;
+  resetErWeights: () => void;
 };
 
 export const useUIStore = create<UIState>()(
@@ -28,6 +36,7 @@ export const useUIStore = create<UIState>()(
       activePlatform: "tiktok",
       recentQueries: { ...EMPTY_RECENT },
       selectedVideoIds: {},
+      erWeights: { ...DEFAULT_WEIGHTS },
       setActivePlatform: (p) => set({ activePlatform: p }),
       pushQuery: (platform, q) => {
         const trimmed = q.trim();
@@ -64,34 +73,45 @@ export const useUIStore = create<UIState>()(
       },
       clearSelection: () => set({ selectedVideoIds: {} }),
       isSelected: (id) => !!get().selectedVideoIds[id],
+      setErWeight: (key, value) => {
+        const next = Number.isFinite(value) ? Math.max(0, Math.min(10, value)) : 0;
+        set({ erWeights: { ...get().erWeights, [key]: next } });
+      },
+      setErWeights: (weights) => set({ erWeights: { ...weights } }),
+      resetErWeights: () => set({ erWeights: { ...DEFAULT_WEIGHTS } }),
     }),
     {
       name: "spark-ui",
       storage: createJSONStorage(() => localStorage),
-      version: 2,
+      version: 3,
       // v1 -> v2: recentQueries was a flat string[], now per-platform.
-      // Migrate the old list into the currently active platform bucket.
+      // v2 -> v3: add erWeights with default values.
       migrate: (persisted, version) => {
-        const p = (persisted ?? {}) as {
+        let p = (persisted ?? {}) as {
           activePlatform?: Platform;
           recentQueries?: unknown;
+          erWeights?: ErWeights;
         };
         if (version < 2) {
           const activePlatform: Platform = p.activePlatform ?? "tiktok";
           const oldList = Array.isArray(p.recentQueries)
             ? (p.recentQueries as string[])
             : [];
-          return {
+          p = {
             activePlatform,
             recentQueries: { ...EMPTY_RECENT, [activePlatform]: oldList },
           };
         }
+        if (version < 3) {
+          return { ...p, erWeights: { ...DEFAULT_WEIGHTS } };
+        }
         return p;
       },
-      // Only persist tab + recent queries; selection is ephemeral per session.
+      // Only persist tab, recent queries, and ER weights; selection is ephemeral.
       partialize: (state) => ({
         activePlatform: state.activePlatform,
         recentQueries: state.recentQueries,
+        erWeights: state.erWeights,
       }),
     }
   )

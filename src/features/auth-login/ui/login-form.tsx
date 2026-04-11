@@ -19,8 +19,15 @@ export function LoginForm() {
     try {
       await mutation.mutateAsync({ email, password });
       toast.success("로그인 성공");
-      router.push(next);
-      router.refresh();
+      // NOTE: router.push + router.refresh() used to race badly:
+      //   - router.refresh() refetches the CURRENT page (/login), which hits
+      //     middleware, sees the new cookie, then redirects to /search.
+      //   - router.push("/search") is also in-flight.
+      // These two conflict and cause a perceptible delay before the UI updates.
+      // router.replace() alone is enough: cookies are already committed by
+      // `await signInWithPassword`, so the middleware will pick them up on the
+      // new route fetch.
+      router.replace(next);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "로그인 실패";
       toast.error(msg);
