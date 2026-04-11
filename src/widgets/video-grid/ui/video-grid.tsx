@@ -110,7 +110,7 @@ export function VideoGrid({ videos, platform, username }: VideoGridProps) {
     <>
       {/* Toolbar: sort + select all */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <SortToolbar value={sortState} onChange={setSortState} />
+        <SortToolbar value={sortState} onChange={setSortState} platform={platform} />
         <div className="flex items-center justify-between gap-2">
           <p className="text-xs text-muted-foreground sm:text-sm">
             {sortedVideos.length}개 · 평균 분석 저장
@@ -217,20 +217,29 @@ export function VideoGrid({ videos, platform, username }: VideoGridProps) {
                       </strong>
                       댓글
                     </span>
-                    <span className="flex items-center gap-1">
+                    <span
+                      className="flex items-center gap-1"
+                      title={
+                        platform === "instagram"
+                          ? "스토리 reshare, 프로필 repost, DM 공유 합산"
+                          : undefined
+                      }
+                    >
                       <Share2 className="h-3.5 w-3.5" />
                       <strong className="text-foreground">
                         {formatCount(avgShares)}
                       </strong>
                       공유
                     </span>
-                    <span className="flex items-center gap-1">
-                      <Repeat2 className="h-3.5 w-3.5" />
-                      <strong className="text-foreground">
-                        {formatCount(avgReposts)}
-                      </strong>
-                      리포스트
-                    </span>
+                    {platform === "tiktok" && (
+                      <span className="flex items-center gap-1">
+                        <Repeat2 className="h-3.5 w-3.5" />
+                        <strong className="text-foreground">
+                          {formatCount(avgReposts)}
+                        </strong>
+                        리포스트
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
