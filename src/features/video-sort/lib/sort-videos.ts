@@ -25,6 +25,8 @@ export function sortVideos(
       return copy.sort((a, b) => (b.comments - a.comments) * mul);
     case "shares":
       return copy.sort((a, b) => (b.shares - a.shares) * mul);
+    case "reposts":
+      return copy.sort((a, b) => (b.reposts - a.reposts) * mul);
     default:
       return copy;
   }
