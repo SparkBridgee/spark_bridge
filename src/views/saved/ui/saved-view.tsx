@@ -119,7 +119,14 @@ function SelectionItem({ selection }: { selection: SavedSelectionWithVideos }) {
                 {formatCount(selection.avg_shares)}
               </span>
             </div>
-            <MetricsBadge er={er} cpv={cpv} className="mt-1" />
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              <MetricsBadge er={er} cpv={cpv} />
+              <CostInput
+                selectionId={selection.id}
+                initialCost={metrics.cost}
+                compact
+              />
+            </div>
           </div>
           <div className="flex w-full gap-2 sm:w-auto">
             <Button
@@ -160,7 +167,7 @@ function SelectionItem({ selection }: { selection: SavedSelectionWithVideos }) {
               className="overflow-hidden"
             >
               <CardContent className="flex flex-col gap-3">
-                <div className="flex flex-col gap-3 border-t pt-3">
+                <div className="border-t pt-3">
                   <MetricsDetail
                     avgViews={metrics.avgViews}
                     avgLikes={metrics.avgLikes}
@@ -172,10 +179,6 @@ function SelectionItem({ selection }: { selection: SavedSelectionWithVideos }) {
                     er={metrics.er}
                     cpv={metrics.cpv}
                     weights={erWeights}
-                  />
-                  <CostInput
-                    selectionId={selection.id}
-                    initialCost={metrics.cost}
                   />
                 </div>
                 {selection.videos.length > 0 && (
